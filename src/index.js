@@ -1,5 +1,5 @@
-export default function ({types: t}) {
-  function visit (path) {
+export default function({types: t}) {
+  function visit(path) {
     let replacement = null;
     if (t.isNumericLiteral(path.node.left) && t.isNumericLiteral(path.node.right)) {
       replacement = t.numericLiteral(evaluate(path));
@@ -8,7 +8,7 @@ export default function ({types: t}) {
     }
 
     if (replacement) {
-    	path.replaceWith(replacement);
+      path.replaceWith(replacement);
     }
   }
 
@@ -19,11 +19,11 @@ export default function ({types: t}) {
   return {
     visitor: {
       BinaryExpression: {
-      	exit: visit
+        exit: visit
       },
       LogicalExpression: {
-      	exit: visit
-	  }
+        exit: visit
+      }
     }
   };
 }
