@@ -1,0 +1,14 @@
+{
+  "name": "babel-constant-expression-folding",
+  "version": "1.0.0",
+  "description": "optimize javascript code with constant expression folding",
+  "main": "index.js",
+  "scripts": {
+    "test": "ava"
+  },
+  "keywords": [
+    "babel"
+  ],
+  "author": "ChristianMurphy",
+  "license": "MIT"
+}
