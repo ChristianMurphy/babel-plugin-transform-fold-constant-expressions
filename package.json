@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "optimize javascript code with constant expression folding",
   "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "babel src -d dist",
     "test": "npm run build; ava; eslint ."
