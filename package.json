@@ -2,15 +2,26 @@
   "name": "babel-plugin-transform-fold-constant-expressions",
   "version": "1.0.0",
   "description": "optimize javascript code with constant expression folding",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "babel src -d dist",
     "test": "npm run build; ava; eslint ."
   },
   "keywords": [
-    "babel"
+    "babel-plugin"
   ],
-  "author": "ChristianMurphy",
+  "author": {
+    "name": "Christian Murphy",
+    "email": "Christian.Murphy.42@gmail.com",
+    "url": "https://github.com/ChristianMurphy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChristianMurphy/babel-plugin-transform-fold-constant-expressions.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ChristianMurphy/babel-plugin-transform-fold-constant-expressions/issues"
+  },
   "license": "MIT",
   "devDependencies": {
     "ava": "^0.14.0",
@@ -21,5 +32,8 @@
     "eslint": "^2.9.0",
     "eslint-config-google": "^0.5.0",
     "eslint-plugin-ava": "^2.3.1"
+  },
+  "engines": {
+    "node": ">=0.12"
   }
 }
