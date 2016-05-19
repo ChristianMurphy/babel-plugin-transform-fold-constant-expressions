@@ -99,3 +99,31 @@ test('number expression with variable partially reduced', t => {
   const actual = transform(example, {plugins: [plugin]}).code;
   t.is(actual, expected);
 });
+
+test('constant single quoted string unchanged', t => {
+  const example = 'var a = \'a\';';
+  const expected = 'var a = \'a\';';
+  const actual = transform(example, {plugins: [plugin]}).code;
+  t.is(actual, expected);
+});
+
+test('constant double quoted string unchanged', t => {
+  const example = 'var a = "a";';
+  const expected = 'var a = "a";';
+  const actual = transform(example, {plugins: [plugin]}).code;
+  t.is(actual, expected);
+});
+
+test('single quoted string concat expression reduced', t => {
+  const example = 'var a = \'a\' + \'a\';';
+  const expected = 'var a = \'aa\';';
+  const actual = transform(example, {plugins: [plugin]}).code;
+  t.is(actual, expected);
+});
+
+test('double quoted string concat expression reduced', t => {
+  const example = 'var a = "a" + "a";';
+  const expected = 'var a = "aa";';
+  const actual = transform(example, {plugins: [plugin]}).code;
+  t.is(actual, expected);
+});
