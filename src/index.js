@@ -7,23 +7,16 @@ export default function({types: t}) {
   function visit(path) {
     let replacement = null;
     if (t.isNumericLiteral(path.node.left) && t.isNumericLiteral(path.node.right)) {
-      replacement = t.numericLiteral(evaluate(path));
+      replacement = t.numericLiteral(eval(`${path.node.left.value} ${path.node.operator} ${path.node.right.value}`));
     } else if (t.isBooleanLiteral(path.node.left) && t.isBooleanLiteral(path.node.right)) {
-      replacement = t.booleanLiteral(evaluate(path));
+      replacement = t.booleanLiteral(eval(`${path.node.left.value} ${path.node.operator} ${path.node.right.value}`));
+    } else if (t.isStringLiteral(path.node.left) && t.isStringLiteral(path.node.right)) {
+      replacement = t.stringLiteral(eval(`'${path.node.left.value}' ${path.node.operator} '${path.node.right.value}'`));
     }
 
     if (replacement) {
       path.replaceWith(replacement);
     }
-  }
-
-  /**
-   * Evaluates an AST expression
-   * @param {Object} path - an AST node with an operator, a left, and right child
-   * @return {any} literal value of the expression
-   */
-  function evaluate(path) {
-    return eval(`${path.node.left.value} ${path.node.operator} ${path.node.right.value}`);
   }
 
   return {
