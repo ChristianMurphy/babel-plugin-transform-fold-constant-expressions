@@ -1,31 +1,49 @@
 export default function({types: t}) {
   /**
-   * Visitor for expressions looks if children are literal values and the same
-   * type then reduces expressions when possible.
+   * Visitor for expressions looks if children are literal
+   * values and the same type then reduces expressions when possible.
    * @param {Object} path - an AST expression node
    */
-  function visit(path) {
-    let replacement = null;
-    if (t.isNumericLiteral(path.node.left) && t.isNumericLiteral(path.node.right)) {
-      replacement = t.numericLiteral(eval(`${path.node.left.value} ${path.node.operator} ${path.node.right.value}`));
-    } else if (t.isBooleanLiteral(path.node.left) && t.isBooleanLiteral(path.node.right)) {
-      replacement = t.booleanLiteral(eval(`${path.node.left.value} ${path.node.operator} ${path.node.right.value}`));
-    } else if (t.isStringLiteral(path.node.left) && t.isStringLiteral(path.node.right)) {
-      replacement = t.stringLiteral(eval(`'${path.node.left.value}' ${path.node.operator} '${path.node.right.value}'`));
-    }
+  function reduceExpressions(path) {
+    const replacement = evaluate(path);
 
     if (replacement) {
       path.replaceWith(replacement);
     }
   }
 
+  /**
+   * Takes in an expression and attempts to evaluate it
+   * @param {Object} path - AST path that is an expression
+   * @return {Object|null} reduced AST node or null if unable to evaluate
+   */
+  function evaluate(path) {
+    const result = path.evaluate();
+    if (result.confident === false) {
+      return null;
+    }
+    switch (typeof result.value) {
+      case 'string':
+        return t.stringLiteral(result.value);
+      case 'number':
+        return t.numericLiteral(result.value);
+      case 'boolean':
+        return t.booleanLiteral(result.value);
+      default:
+        return null;
+    }
+  }
+
   return {
     visitor: {
       BinaryExpression: {
-        exit: visit
+        exit: reduceExpressions
       },
       LogicalExpression: {
-        exit: visit
+        exit: reduceExpressions
+      },
+      CallExpression: {
+        exit: reduceExpressions
       }
     }
   };
