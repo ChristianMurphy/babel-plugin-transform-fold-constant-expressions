@@ -1,7 +1,8 @@
 {
+  "compact": true,
+  "comments": false,
   "presets": [
     "es2015",
     "stage-2"
-  ],
-  "compact": true
+  ]
 }
