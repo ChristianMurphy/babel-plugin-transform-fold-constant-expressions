@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-transform-fold-constant-expressions",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "optimize javascript code with constant expression folding",
   "main": "dist/index.js",
   "files": [
