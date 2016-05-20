@@ -107,7 +107,42 @@ test('inferred number expression reduced', t => {
   t.is(actual, expected);
 });
 
-test('number library calls reduced', t => {
+test('number library abs calls reduced', t => {
+  const example = 'var a = Math.abs(-2);';
+  const expected = 'var a = 2;';
+  const actual = transform(example, {plugins: [plugin]}).code;
+  t.is(actual, expected);
+});
+
+test('number library cbrt calls reduced', t => {
+  const example = 'var a = Math.cbrt(27);';
+  const expected = 'var a = 3;';
+  const actual = transform(example, {plugins: [plugin]}).code;
+  t.is(actual, expected);
+});
+
+test('number library ceil calls reduced', t => {
+  const example = 'var a = Math.ceil(2.1);';
+  const expected = 'var a = 3;';
+  const actual = transform(example, {plugins: [plugin]}).code;
+  t.is(actual, expected);
+});
+
+test('number library max calls reduced', t => {
+  const example = 'var a = Math.max(-1, 2, -2);';
+  const expected = 'var a = 2;';
+  const actual = transform(example, {plugins: [plugin]}).code;
+  t.is(actual, expected);
+});
+
+test('number library min calls reduced', t => {
+  const example = 'var a = Math.min(-1, 2, -2);';
+  const expected = 'var a = -2;';
+  const actual = transform(example, {plugins: [plugin]}).code;
+  t.is(actual, expected);
+});
+
+test('number library pow calls reduced', t => {
   const example = 'var a = Math.pow(2, 3);';
   const expected = 'var a = 8;';
   const actual = transform(example, {plugins: [plugin]}).code;
@@ -163,9 +198,30 @@ test('inferred string concat expression reduced', t => {
   t.is(actual, expected);
 });
 
-test('string libary calls  reduced', t => {
+test('string libary charAt calls reduced', t => {
+  const example = 'var a = "abc".charAt(1);';
+  const expected = 'var a = "b";';
+  const actual = transform(example, {plugins: [plugin]}).code;
+  t.is(actual, expected);
+});
+
+test('string libary trim calls reduced', t => {
   const example = 'var a = "  a  ".trim();';
   const expected = 'var a = "a";';
+  const actual = transform(example, {plugins: [plugin]}).code;
+  t.is(actual, expected);
+});
+
+test('string libary includes calls reduced', t => {
+  const example = 'var a = "abc".includes("c");';
+  const expected = 'var a = true;';
+  const actual = transform(example, {plugins: [plugin]}).code;
+  t.is(actual, expected);
+});
+
+test('string expression with variable partially reduced', t => {
+  const example = 'var a = "a" + "b" + c;';
+  const expected = 'var a = "ab" + c;';
   const actual = transform(example, {plugins: [plugin]}).code;
   t.is(actual, expected);
 });
