@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "build": "babel src -d dist --no-comments",
-    "test": "npm run build; ava; eslint .; remark *.md -u remark-lint -q --no-stdout"
+    "test": "npm run build && ava && eslint . && remark *.md -u remark-lint -q --no-stdout"
   },
   "keywords": [
     "babel-plugin"
