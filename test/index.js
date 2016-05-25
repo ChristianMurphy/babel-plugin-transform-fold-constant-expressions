@@ -239,13 +239,6 @@ test(
 );
 
 test(
-  'string libary includes calls reduced',
-  [babelES6Transform],
-  'var a = "abc".includes("c");',
-  'var a = true;'
-);
-
-test(
   'string expression with variable partially reduced',
   [babelES5Transform, babelES6Transform],
   'var a = "a" + "b" + c;',
