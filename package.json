@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "build": "babel src -d dist --no-comments",
-    "test": "npm run build; ava; eslint .; remark *.md -u remark-lint -q --no-stdout"
+    "test": "npm run build && ava && eslint . && remark *.md -u remark-lint -q --no-stdout"
   },
   "keywords": [
     "babel-plugin"
@@ -27,7 +27,7 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "ava": "^0.14.0",
+    "ava": "^0.15.0",
     "babel-cli": "^6.9.0",
     "babel-core": "^6.9.0",
     "babel-preset-es2015": "^6.9.0",

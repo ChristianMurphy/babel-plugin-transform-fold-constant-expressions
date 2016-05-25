@@ -1,227 +1,254 @@
 import test from 'ava';
 import {transform} from 'babel-core';
+import es2015 from 'babel-preset-es2015';
+import stage2 from 'babel-preset-stage-2';
 import plugin from '../dist/index';
 
-test('constant boolean unchanged', t => {
-  const example = 'var a = true;';
-  const expected = 'var a = true;';
-  const actual = transform(example, {plugins: [plugin]}).code;
+function babelES5Transform(t, input, expected) {
+  const actual = transform(input, {plugins: [plugin]}).code;
   t.is(actual, expected);
-});
+}
 
-test('true boolean and expression reduced', t => {
-  const example = 'var a = true && true;';
-  const expected = 'var a = true;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+function babelES6Transform(t, input, expected) {
+  const actual = transform(input, {plugins: [plugin], presets: [es2015]}).code;
+  t.is(actual, '"use strict";\n\n' + expected);
+}
 
-test('true boolean or expression reduced', t => {
-  const example = 'var a = false || true;';
-  const expected = 'var a = true;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+function babelES7Transform(t, input, expected) {
+  const actual = transform(input, {plugins: [plugin], presets: [es2015, stage2]}).code;
+  t.is(actual, '"use strict";\n\n' + expected);
+}
 
-test('false boolean or expression reduced', t => {
-  const example = 'var a = false || false;';
-  const expected = 'var a = false;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+function titleFactory(version) {
+  return (providedTitle, input, expected) => providedTitle ?
+    `${providedTitle} in ${version}` :
+    `"${input}" becomes "${expected}" in ${version}`;
+}
 
-test('true boolean mixed expression reduced', t => {
-  const example = 'var a = true && false || true;';
-  const expected = 'var a = true;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+babelES5Transform.title = titleFactory('ES5');
+babelES6Transform.title = titleFactory('ES6');
+babelES7Transform.title = titleFactory('ES7');
 
-test('false boolean mixed expression reduced', t => {
-  const example = 'var a = true && (false || false);';
-  const expected = 'var a = false;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'constant boolean unchanged',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = true;',
+  'var a = true;'
+);
 
-test('inferred boolean expression reduced', t => {
-  const example = 'var a = true; var b = false || a;';
-  const expected = 'var a = true;var b = true;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'true boolean and expression reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = true && true;',
+  'var a = true;'
+);
 
-test('boolean expression with variable partially reduced', t => {
-  const example = 'var a = b || true && false;';
-  const expected = 'var a = b || false;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'true boolean or expression reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = false || true;',
+  'var a = true;'
+);
 
-test('constant number unchanged', t => {
-  const example = 'var a = 1;';
-  const expected = 'var a = 1;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'false boolean or expression reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = false || false;',
+  'var a = false;'
+);
 
-test('number addition expression reduced', t => {
-  const example = 'var a = 1 + 1;';
-  const expected = 'var a = 2;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'true boolean mixed expression reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = true && false || true;',
+  'var a = true;'
+);
 
-test('number subtraction expression reduced', t => {
-  const example = 'var a = 1 - 1;';
-  const expected = 'var a = 0;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'false boolean mixed expression reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = true && (false || false);',
+  'var a = false;'
+);
 
-test('number multiplication expression reduced', t => {
-  const example = 'var a = 2 * 2;';
-  const expected = 'var a = 4;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'inferred boolean expression reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = true; var b = false || a;',
+  'var a = true;var b = true;'
+);
 
-test('number division expression reduced', t => {
-  const example = 'var a = 2 / 2;';
-  const expected = 'var a = 1;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'boolean expression with variable partially reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = b || true && false;',
+  'var a = b || false;'
+);
 
-test('number mixed expression reduced', t => {
-  const example = 'var a = 2 * 2 + 2 * 2;';
-  const expected = 'var a = 8;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'constant number unchanged',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = 1;',
+  'var a = 1;'
+);
 
-test('inferred number expression reduced', t => {
-  const example = 'var a = 2 + 2; var b = a * 2;';
-  const expected = 'var a = 4;var b = 8;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'number addition expression reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = 1 + 1;',
+  'var a = 2;'
+);
 
-test('number library abs calls reduced', t => {
-  const example = 'var a = Math.abs(-2);';
-  const expected = 'var a = 2;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'number subtraction expression reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = 1 - 1;',
+  'var a = 0;'
+);
 
-test('number library cbrt calls reduced', t => {
-  const example = 'var a = Math.cbrt(27);';
-  const expected = 'var a = 3;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'number multiplication expression reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = 2 * 2;',
+  'var a = 4;'
+);
 
-test('number library ceil calls reduced', t => {
-  const example = 'var a = Math.ceil(2.1);';
-  const expected = 'var a = 3;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'number division expression reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = 2 / 2;',
+  'var a = 1;'
+);
 
-test('number library max calls reduced', t => {
-  const example = 'var a = Math.max(-1, 2, -2);';
-  const expected = 'var a = 2;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'number exponential expression reduced',
+  [babelES7Transform],
+  'var a = 4 ** 2;',
+  'var a = 16;'
+);
 
-test('number library min calls reduced', t => {
-  const example = 'var a = Math.min(-1, 2, -2);';
-  const expected = 'var a = -2;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'number mixed expression reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = 2 * 2 + 2 * 2;',
+  'var a = 8;'
+);
 
-test('number library pow calls reduced', t => {
-  const example = 'var a = Math.pow(2, 3);';
-  const expected = 'var a = 8;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'inferred number expression reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = 2 + 2; var b = a * 2;',
+  'var a = 4;var b = 8;'
+);
 
-test('number library Math.random calls not reduced', t => {
-  const example = 'var a = Math.random();';
-  const expected = 'var a = Math.random();';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'number library abs calls reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = Math.abs(-2);',
+  'var a = 2;'
+);
 
-test('number expression with variable partially reduced', t => {
-  const example = 'var a = b + 2 * 2;';
-  const expected = 'var a = b + 4;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'number library cbrt calls reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = Math.cbrt(27);',
+  'var a = 3;'
+);
 
-test('constant single quoted string unchanged', t => {
-  const example = 'var a = \'a\';';
-  const expected = 'var a = \'a\';';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'number library ceil calls reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = Math.ceil(2.1);',
+  'var a = 3;'
+);
 
-test('constant double quoted string unchanged', t => {
-  const example = 'var a = "a";';
-  const expected = 'var a = "a";';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'number library max calls reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = Math.max(-1, 2, -2);',
+  'var a = 2;'
+);
 
-test('single quoted string concat expression reduced', t => {
-  const example = 'var a = \'a\' + \'a\';';
-  const expected = 'var a = \'aa\';';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'number library min calls reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = Math.min(-1, 2, -2);',
+  'var a = -2;'
+);
 
-test('double quoted string concat expression reduced', t => {
-  const example = 'var a = "a" + "a";';
-  const expected = 'var a = "aa";';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'number library pow calls reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = Math.pow(2, 3);',
+  'var a = 8;'
+);
 
-test('inferred string concat expression reduced', t => {
-  const example = 'var a = "a"; var b = a + "a";';
-  const expected = 'var a = "a";var b = "aa";';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'number library Math.random calls not reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = Math.random();',
+  'var a = Math.random();'
+);
 
-test('string libary charAt calls reduced', t => {
-  const example = 'var a = "abc".charAt(1);';
-  const expected = 'var a = "b";';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'number expression with variable partially reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = b + 2 * 2;',
+  'var a = b + 4;'
+);
 
-test('string libary trim calls reduced', t => {
-  const example = 'var a = "  a  ".trim();';
-  const expected = 'var a = "a";';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'constant single quoted string unchanged',
+  [babelES5Transform],
+  'var a = \'a\';',
+  'var a = \'a\';'
+);
 
-test('string libary includes calls reduced', t => {
-  const example = 'var a = "abc".includes("c");';
-  const expected = 'var a = true;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'constant double quoted string unchanged',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = "a";',
+  'var a = "a";'
+);
 
-test('string expression with variable partially reduced', t => {
-  const example = 'var a = "a" + "b" + c;';
-  const expected = 'var a = "ab" + c;';
-  const actual = transform(example, {plugins: [plugin]}).code;
-  t.is(actual, expected);
-});
+test(
+  'single quoted string concat expression reduced',
+  [babelES5Transform],
+  'var a = \'a\' + \'a\';',
+  'var a = \'aa\';'
+);
+
+test(
+  'double quoted string concat expression reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = "a" + "a";',
+  'var a = "aa";'
+);
+
+test(
+  'inferred string concat expression reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = "a"; var b = a + "a";',
+  'var a = "a";var b = "aa";'
+);
+
+test(
+  'string libary charAt calls reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = "abc".charAt(1);',
+  'var a = "b";'
+);
+
+test(
+  'string libary trim calls reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = "  a  ".trim();',
+  'var a = "a";'
+);
+
+test(
+  'string expression with variable partially reduced',
+  [babelES5Transform, babelES6Transform, babelES7Transform],
+  'var a = "a" + "b" + c;',
+  'var a = "ab" + c;'
+);
