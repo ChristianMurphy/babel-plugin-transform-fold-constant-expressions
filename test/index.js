@@ -4,26 +4,33 @@ import es2015 from 'babel-preset-es2015';
 import stage2 from 'babel-preset-stage-2';
 import plugin from '../dist/index';
 
-function babelES5Transform(t, input, expected) {
-  const actual = transform(input, {plugins: [plugin]}).code;
-  t.is(actual, expected);
+/**
+ * Creates test macros from babel presets and a test prefix
+ * @param {Object[]} presets - babel presets for transform
+ * @param {string} prefix - text to prepend to expected output
+ * @return {function} test macro
+ */
+function babelTransformFactory(presets = [], prefix = '') {
+  return (t, input, expected) => {
+    const actual = transform(input, {plugins: [plugin], presets}).code;
+    t.is(actual, `${prefix}${expected}`);
+  };
 }
 
-function babelES6Transform(t, input, expected) {
-  const actual = transform(input, {plugins: [plugin], presets: [es2015]}).code;
-  t.is(actual, '"use strict";\n\n' + expected);
-}
-
-function babelES7Transform(t, input, expected) {
-  const actual = transform(input, {plugins: [plugin], presets: [es2015, stage2]}).code;
-  t.is(actual, '"use strict";\n\n' + expected);
-}
-
+/**
+ * Creates titles for a test macro
+ * @param {string} version - Javascript version or dialet being tested
+ * @return {function} title macro
+ */
 function titleFactory(version) {
   return (providedTitle, input, expected) => providedTitle ?
     `${providedTitle} in ${version}` :
     `"${input}" becomes "${expected}" in ${version}`;
 }
+
+const babelES5Transform = babelTransformFactory();
+const babelES6Transform = babelTransformFactory([es2015], '"use strict";\n\n');
+const babelES7Transform = babelTransformFactory([es2015, stage2], '"use strict";\n\n');
 
 babelES5Transform.title = titleFactory('ES5');
 babelES6Transform.title = titleFactory('ES6');
