@@ -1,3 +1,7 @@
 extends: plugin:ava/recommended
 plugins:
   - ava
+settings:
+  import/ignore:
+    - node_modules
+    - dist
