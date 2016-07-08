@@ -1,7 +1,7 @@
 import test from 'ava';
 import {transform} from 'babel-core';
 import es2015 from 'babel-preset-es2015';
-import stage2 from 'babel-preset-stage-2';
+import es2016 from 'babel-preset-es2016';
 import plugin from '../dist/index';
 
 /**
@@ -30,7 +30,7 @@ function titleFactory(version) {
 
 const babelES5Transform = babelTransformFactory();
 const babelES6Transform = babelTransformFactory([es2015], '"use strict";\n\n');
-const babelES7Transform = babelTransformFactory([es2015, stage2], '"use strict";\n\n');
+const babelES7Transform = babelTransformFactory([es2015, es2016], '"use strict";\n\n');
 
 babelES5Transform.title = titleFactory('ES5');
 babelES6Transform.title = titleFactory('ES6');
